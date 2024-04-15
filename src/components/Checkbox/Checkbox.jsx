@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 
 export const Checkbox = ({ element, formData, handleChange }) => {
   if (element.options) {
