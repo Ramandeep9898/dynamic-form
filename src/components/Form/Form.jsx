@@ -5,6 +5,7 @@ import { Dropdown } from "../Dropdown/Dropdown";
 
 export const Form = ({ config, onSubmitHandler }) => {
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -24,6 +25,47 @@ export const Form = ({ config, onSubmitHandler }) => {
         ...prevData,
         [name]: value,
       }));
+    }
+  };
+
+  const handleSubmit = () => {
+    let formIsValid = true;
+    const newErrors = {};
+
+    config.forEach((ele) => {
+      if (ele.required && !formData[ele.name]) {
+        newErrors[ele.name] = `${ele.label} field is required.`;
+        formIsValid = false;
+      }
+      if (ele.type === "text") {
+        if (
+          ele.validation &&
+          ele.validation.minLength &&
+          formData[ele.name]?.length < ele.validation.minLength
+        ) {
+          newErrors[
+            ele.name
+          ] = `Minimum ${ele.validation.minLength} characters required.`;
+          formIsValid = false;
+        }
+        if (
+          ele.validation &&
+          ele.validation.maxLength &&
+          formData[ele.name]?.length > ele.validation.maxLength
+        ) {
+          newErrors[
+            ele.name
+          ] = `Maximum ${ele.validation.maxLength} characters allowed.`;
+          formIsValid = false;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+
+    if (formIsValid) {
+      onSubmitHandler(formData);
+      setFormData({});
     }
   };
 
@@ -49,19 +91,19 @@ export const Form = ({ config, onSubmitHandler }) => {
     };
     return obj[ele.type];
   };
+
   return (
     <div>
       {config.map((ele, index) => (
         <div key={index}>{returnComponents({ ele })}</div>
       ))}
-      <button
-        onClick={() => {
-          onSubmitHandler(formData);
-          setFormData({});
-        }}
-      >
-        Submit
-      </button>
+      <button onClick={handleSubmit}>Submit</button>
+
+      {Object.keys(errors).map((key) => (
+        <div key={key} style={{ color: "red" }}>
+          {errors[key]}
+        </div>
+      ))}
     </div>
   );
 };

@@ -6,19 +6,23 @@ export const formConfig = [
     placeholder: "Enter text",
     defaultValue: "",
     required: true,
+    validation: {
+      minLength: 3,
+      maxLength: 10,
+    },
   },
-
   {
     type: "checkbox",
     name: "singleCheckbox",
     label: "Single Checkbox",
     checked: false,
+    required: true,
   },
-
   {
     type: "checkbox",
     name: "multipleCheckboxes",
     label: "Multiple Checkboxes",
+    required: true,
     options: [
       {
         label: "Option 1",
