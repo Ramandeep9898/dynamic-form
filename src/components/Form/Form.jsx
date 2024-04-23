@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Input } from "../Input/Input";
 import { Checkbox } from "../Checkbox/Checkbox";
 import { Dropdown } from "../Dropdown/Dropdown";
+import { Chips } from "../Chips/Chips";
 
 export const Form = ({ config, onSubmitHandler }) => {
   const [formData, setFormData] = useState({});
@@ -88,15 +89,25 @@ export const Form = ({ config, onSubmitHandler }) => {
           handleChange={handleChange}
         />
       ),
+      chips: (
+        <Chips element={ele} handleChange={handleChange} formData={formData} />
+      ),
     };
     return obj[ele.type];
   };
 
   return (
     <div>
-      {config.map((ele, index) => (
-        <div key={index}>{returnComponents({ ele })}</div>
-      ))}
+      {config.map((ele, index) => {
+        if (ele.rule) {
+          if (formData[ele.rule.key]?.includes(ele.rule.value)) {
+            return <div key={index}>{returnComponents({ ele })}</div>;
+          } else {
+            return null;
+          }
+        }
+        return <div key={index}>{returnComponents({ ele })}</div>;
+      })}
       <button onClick={handleSubmit}>Submit</button>
 
       {Object.keys(errors).map((key) => (
