@@ -98,7 +98,7 @@ export const formConfig = [
     type: "select",
     visible: false,
     rule: {
-      key: "multipleCheckboxes",
+      key: "hobbies",
       value: "coding",
     },
     name: "stack",
