@@ -4,11 +4,15 @@ import { formConfig } from "./config/form.config";
 
 function App() {
   const onSubmitHandler = (data) => {
-    console.log(data);
+    console.log("data", data);
   };
   return (
     <div className="App">
-      <Form config={formConfig} onSubmitHandler={onSubmitHandler} />
+      <Form
+        config={formConfig}
+        onSubmitHandler={onSubmitHandler}
+        showSubmitButton={true}
+      />
     </div>
   );
 }

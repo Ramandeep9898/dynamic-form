@@ -1,14 +1,29 @@
-import React, { useState } from "react";
-import { Input } from "../Input/Input";
-import { Checkbox } from "../Checkbox/Checkbox";
-import { Dropdown } from "../Dropdown/Dropdown";
-import { Chips } from "../Chips/Chips";
+import React, { useEffect, useState } from "react";
+import { returnComponents } from "../../ulti/returnComponent";
 
-export const Form = ({ config, onSubmitHandler }) => {
+export const Form = ({
+  config,
+  onChange,
+  layout,
+  onSubmitHandler,
+  showSubmitButton,
+}) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
-  const handleChange = (event) => {
+  useEffect(() => {
+    onChange && onChange(formData);
+  }, [formData]);
+
+  const handleChange = (event, fieldName, val) => {
+    if (fieldName && val) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [fieldName]: val,
+      }));
+      return;
+    }
+
     const { name, value, type, checked } = event.target;
     if (type === "checkbox") {
       const updatedData = { ...formData };
@@ -70,45 +85,41 @@ export const Form = ({ config, onSubmitHandler }) => {
     }
   };
 
-  const returnComponents = ({ ele }) => {
-    const obj = {
-      text: (
-        <Input element={ele} formData={formData} handleChange={handleChange} />
-      ),
-      checkbox: (
-        <Checkbox
-          element={ele}
-          formData={formData}
-          handleChange={handleChange}
-        />
-      ),
-      select: (
-        <Dropdown
-          element={ele}
-          formData={formData}
-          handleChange={handleChange}
-        />
-      ),
-      chips: (
-        <Chips element={ele} handleChange={handleChange} formData={formData} />
-      ),
-    };
-    return obj[ele.type];
-  };
-
   return (
-    <div>
+    <div
+      style={{
+        display: layout === "horizontal" ? "flex" : "block",
+      }}
+    >
       {config.map((ele, index) => {
         if (ele.rule) {
-          if (formData[ele.rule.key]?.includes(ele.rule.value)) {
-            return <div key={index}>{returnComponents({ ele })}</div>;
+          if (ele.rule.condition) {
+            if (ele.rule.condition === ">") {
+              if (Number(formData[ele.rule.key]) > ele.rule.value) {
+                return (
+                  <div key={index}>
+                    {returnComponents({ ele, handleChange, formData })}
+                  </div>
+                );
+              } else return null;
+            } else return null;
+          } else if (formData[ele.rule.key]?.includes(ele.rule.value)) {
+            return (
+              <div key={index}>
+                {returnComponents({ ele, handleChange, formData })}
+              </div>
+            );
           } else {
             return null;
           }
         }
-        return <div key={index}>{returnComponents({ ele })}</div>;
+        return (
+          <div key={index}>
+            {returnComponents({ ele, handleChange, formData })}
+          </div>
+        );
       })}
-      <button onClick={handleSubmit}>Submit</button>
+      {showSubmitButton && <button onClick={handleSubmit}>Submit</button>}
 
       {Object.keys(errors).map((key) => (
         <div key={key} style={{ color: "red" }}>
